@@ -119,3 +119,37 @@ def check_file(bucket, region, key):
 
     return data
 
+
+def delete_bucket(bucket, region):
+    """ 删除桶 """
+    config = CosConfig(Region=region, SecretId=settings.TENCENT_COS_ID, SecretKey=settings.TENCENT_COS_KEY)
+    client = CosS3Client(config)
+
+    # 删除桶中所有文件
+    while True:
+        part_objects = client.list_objects(bucket)
+        contents = part_objects.get('Contents')
+        if not contents:
+            break
+
+        objects = {
+            "Quiet": "true",
+            "Object": [{'Key': item['Key']} for item in contents]
+        }
+        client.delete_objects(bucket, objects)
+        if part_objects['IsTruncated'] == "false":
+            break
+
+    # 删除桶中所有碎片
+    while True:
+        part_uploads = client.list_multipart_uploads(bucket)
+        uploads = part_uploads.get('Upload')
+        if not uploads:
+            break
+        for item in uploads:
+            client.abort_multipart_upload(bucket, item['Key'], item['UploadId'])
+        if part_objects['IsTruncated'] == "false":
+            break
+
+    # 删除桶
+    client.delete_bucket(bucket)

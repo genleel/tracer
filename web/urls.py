@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.urls import include
 
-from web.views import account, home, project, manage, wiki, file
+from web.views import account, home, project, manage, wiki, file, setting
 
 urlpatterns = [
     url(r'^register/$', account.register, name='register'),
@@ -34,8 +34,11 @@ urlpatterns = [
         url(r'^file/delete/$', file.file_delete, name='file_delete'),
         url(r'^cos/credential/$', file.cos_credential, name='cos_credential'),
         url(r'^file/post/$', file.file_post, name='file_post'),
+        url(r'^file/download/(?P<file_id>\d+)/$', file.file_download, name='file_download'),
 
-        url(r'^settings/$', manage.settings, name='settings'),
+        url(r'^setting/$', setting.setting, name='setting'),
+        url(r'^setting/delete/$', setting.delete, name='setting_delete'),
+
     ], None)),
 
 ]

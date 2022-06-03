@@ -24,7 +24,7 @@ def manage_menu_list(request):
         {'title': '统计', 'url': reverse('statistics', kwargs={'project_id': request.tracer.project.id})},
         {'title': 'wiki', 'url': reverse('wiki', kwargs={'project_id': request.tracer.project.id})},
         {'title': '文件', 'url': reverse('file', kwargs={'project_id': request.tracer.project.id})},
-        {'title': '设置', 'url': reverse('settings', kwargs={'project_id': request.tracer.project.id})},
+        {'title': '设置', 'url': reverse('setting', kwargs={'project_id': request.tracer.project.id})},
     ]
     # 设置选中状态
     for item in data_list:
