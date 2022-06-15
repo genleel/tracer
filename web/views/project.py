@@ -35,7 +35,7 @@ def project_list(request):
     form = ProjectModelForm(request, data=request.POST)
     if form.is_valid():
         # 验证通过
-        # 为项目创建一个桶
+        # 1.为项目创建一个桶
         name = form.cleaned_data['name']
         bucket = "{}-1305880705".format(name)
         region = 'ap-beijing'
@@ -45,8 +45,15 @@ def project_list(request):
         form.instance.region = region
         form.instance.creator = request.tracer.user
 
-        # 创建项目
-        form.save()
+        # 2.创建项目
+        instance = form.save()
+
+        # 3.项目初始化问题类型
+        issues_type_object_list = []
+        for item in models.IssuesType.PROJECT_INIT_LIST:
+            issues_type_object_list.append(models.IssuesType(project=instance, title=item))
+        models.IssuesType.objects.bulk_create(issues_type_object_list)
+
         return JsonResponse({'status': True})
 
     return JsonResponse({'status': False, 'error': form.errors})

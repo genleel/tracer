@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.urls import include
 
-from web.views import account, home, project, manage, wiki, file, setting
+from web.views import account, home, project, manage, wiki, file, setting, issues
 
 urlpatterns = [
     url(r'^register/$', account.register, name='register'),
@@ -20,7 +20,6 @@ urlpatterns = [
     # 项目管理
     url(r'^manage/(?P<project_id>\d+)/', include([
         url(r'^dashboard/$', manage.dashboard, name='dashboard'),
-        url(r'^issues/$', manage.issues, name='issues'),
         url(r'^statistics/$', manage.statistics, name='statistics'),
 
         url(r'^wiki/$', wiki.wiki, name='wiki'),
@@ -38,6 +37,10 @@ urlpatterns = [
 
         url(r'^setting/$', setting.setting, name='setting'),
         url(r'^setting/delete/$', setting.delete, name='setting_delete'),
+
+        url(r'^issues/$', issues.issues, name='issues'),
+        url(r'^issues/detail/(?P<issues_id>\d+)/$', issues.issues_detail, name='issues_detail'),
+        url(r'^issues/record/(?P<issues_id>\d+)/$', issues.issues_record, name='issues_record'),
 
     ], None)),
 
