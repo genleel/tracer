@@ -75,12 +75,12 @@ WSGI_APPLICATION = 'tracer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -129,21 +129,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # 腾讯云短信应用的 app_id
-TENCENT_SMS_APP_ID = 000000000
+TENCENT_SMS_APP_ID = 6666666666
 
 # 腾讯云短信应用的 app_key
-TENCENT_SMS_APP_KEY = "000000000000000"
+TENCENT_SMS_APP_KEY = "6666666666666666666666"
 
 # 腾讯云短信签名内容
-TENCENT_SMS_SIGN = "null"
+TENCENT_SMS_SIGN = "Tracer"
+
+TENCENT_SMS_TEMPLATE = {
+    'register': 548760,
+    'login': 548762
+}
+
 
 TENCENT_COS_ID = ""
 TENCENT_COS_KEY = ""
 
-TENCENT_SMS_TEMPLATE = {
-    'register': 000000,
-    'login': 000000
-}
 
 # 白名单
 WHITE_REGEX_URL_LIST = [

@@ -79,8 +79,24 @@
                 <div class="panel-heading">
                     <i class="fa fa-search" aria-hidden="true"></i> 筛选
                 </div>
-                <div class="panel-body">
-                    筛选选项
+                <div class="panel-body filter-area">
+                    <div class="item">
+                        <div class="title">状态</div>
+                        <div class="check-list">
+                            {% for item in status_filter %}
+                                {{ item }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="title">优先级</div>
+                        <div class="check-list">
+                            {% for item in priority_filter %}
+                                {{ item }}
+                            {% endfor %}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -105,7 +121,8 @@
                             </td>
                             <td class="issue">
                                 <div>
-                                    <a target="_blank" href="{% url 'issues_detail' project_id=request.tracer.project.id issues_id=item.id %}">{{ item.subject }}</a>
+                                    <a target="_blank"
+                                       href="{% url 'issues_detail' project_id=request.tracer.project.id issues_id=item.id %}">{{ item.subject }}</a>
                                 </div>
                                 <div class="tags">
                                     <span class="type">{{ item.issues_type.title }}</span>
@@ -336,7 +353,19 @@
             bindBootStrapShownEvent();
             initDatePicker();
             bindAddSubmit();
+
+            bindClickCheckFilter();
+
         });
+
+        /*
+         点击筛选的checkbox
+         */
+        function bindClickCheckFilter() {
+            $('.filter-area').find(':checkbox').click(function () {
+                location.href = $(this).parent().attr('href');
+            });
+        }
 
         // 添加对话框：初始化时间选择
         function initDatePicker() {

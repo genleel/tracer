@@ -2,6 +2,7 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 
 from utils.pagination import Pagination
@@ -9,26 +10,80 @@ from web import models
 from web.forms.issues import IssuesModelForm, IssuesReplyModelForm
 
 
+class CheckFilter(object):
+    def __init__(self, name, data_list, request):
+        self.name = name
+        self.request = request
+        self.data_list = data_list
+
+    def __iter__(self):
+
+        for item in self.data_list:
+            value_list = self.request.GET.getlist(self.name)
+            key = str(item[0])
+            text = item[1]
+            ck = ""
+            if key in value_list:
+                ck = 'checked'
+                value_list.remove(key)
+            else:
+                value_list.append(key)
+
+            # 生成url
+            query_dict = self.request.GET.copy()
+            query_dict._mutable = True
+            query_dict.setlist(self.name, value_list)
+
+            url = '{}?{}'.format(self.request.path_info, query_dict.urlencode())
+
+            tpl = '<a class="cell" href="{url}"><input type="checkbox" {ck} /><label>{text}</label></a>'
+            html = tpl.format(url=url, ck=ck, text=text)
+            yield mark_safe(html)
+
+
 def issues(request, project_id):
     if request.method == "GET":
-        # 分页展示
-        queryset = models.Issues.objects.filter(project_id=project_id)
+        # 根据URL做筛选，筛选条件（根据用户通过GET传过来的参数实现）
+        # ?status=1&status=2&issues_type=1
+        allow_filter_name = ['issues_type', 'status', 'priority', 'assign', 'attention']
+        condition = {}
+        for name in allow_filter_name:
+            value_list = request.GET.getlist(name)  # [1,2]
+            if not value_list:
+                continue
+            condition["{}__in".format(name)] = value_list
+        """
+        condition = {
+            "status__in":[1,2],
+            'issues_type':[1,]
+        }
+        """
 
+        # 分页获取数据
+        queryset = models.Issues.objects.filter(project_id=project_id).filter(**condition)
         page_object = Pagination(
             current_page=request.GET.get('page'),
             all_count=queryset.count(),
             base_url=request.path_info,
             query_params=request.GET,
-            per_page=10
+            per_page=50
         )
-        issues_object_list = queryset[page_object.start: page_object.end]
+        issues_object_list = queryset[page_object.start:page_object.end]
 
         form = IssuesModelForm(request)
-        context = {'form': form, 'issues_object_list': issues_object_list, 'page_html': page_object.page_html()}
+        context = {
+            'form': form,
+            'issues_object_list': issues_object_list,
+            'page_html': page_object.page_html(),
+            'status_filter': CheckFilter('status', models.Issues.status_code, request),
+            'priority_filter': CheckFilter('priority', models.Issues.priority_choices, request),
+
+        }
         return render(request, 'issues.html', context)
 
     print(request.POST)
     form = IssuesModelForm(request, data=request.POST)
+
     if form.is_valid():
         form.instance.project = request.tracer.project
         form.instance.creator = request.tracer.user
@@ -204,7 +259,7 @@ def issues_change(request, project_id, issues_id):
 
             username_list = []
             for user_id in value:
-                username = user_dict.get(str(user_id))
+                username = user_dict.get(int(user_id))
                 if not username:
                     return JsonResponse({'status': False, 'error': "用户不存在"})
                 username_list.append(username)
@@ -213,5 +268,6 @@ def issues_change(request, project_id, issues_id):
             issues_object.save()
             change_record = '{}更新为{}'.format(field_object.verbose_name, ','.join(username_list))
 
+        return JsonResponse({'status': True, 'data': create_reply_record(change_record)})
 
-    return JsonResponse({})
+    return JsonResponse({'status': False, 'error': "无访问权限"})

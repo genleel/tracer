@@ -45,6 +45,7 @@
 
 {% block content %}
     <div class="container-fluid">
+
         <div class="panel panel-default" style="margin-top: 20px;">
             <!-- Default panel contents -->
             <div class="panel-heading">
@@ -115,12 +116,11 @@
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                 </a>
                             {% else %}
-                                <a class="btn btn-default btn-xs download"
+                                <a class="btn btn-default btn-xs"
                                    href="{% url 'file_download' project_id=request.tracer.project.id file_id=item.id %}">
                                     <i class="fa fa-cloud-download" aria-hidden="true"></i>
                                 </a>
                             {% endif %}
-
 
                             <a class="btn btn-danger btn-xs"
                                data-toggle="modal"
@@ -134,6 +134,7 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 
     <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -227,6 +228,10 @@
                 <td class="datetime"></td>
                 <td>
 
+                    <a class="btn btn-default btn-xs download">
+                        <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                    </a>
+
                     <a class="btn btn-danger btn-xs delete" data-toggle="modal" data-target="#alertModal">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                     </a>
@@ -285,6 +290,8 @@
                     }
                 });
 
+                console.log(cos_credential);
+
                 // 上传文件（上传之前先获取临时凭证
                 $.each(fileList, function (index, fileObject) {
                     var fileName = fileObject.name;
@@ -318,17 +325,17 @@
                                 etag: data.ETag,
                                 file_path: data.Location
                             }, function (res) {
-                                // 在数据库中写入成功
+                                // 在数据库中写入成功，将已添加的数据在页面上动态展示。
                                 var newTr = $('#rowTpl').find('tr').clone();
                                 newTr.find('.name').text(res.data.name);
                                 newTr.find('.file_size').text(res.data.file_size);
                                 newTr.find('.username').text(res.data.username);
                                 newTr.find('.datetime').text(res.data.datetime);
-                                newTr.find('.delete').attr('data_fid', res.data.id);
+                                newTr.find('.delete').attr('data-fid', res.data.id);
                                 newTr.find('.download').attr('href', res.data.download_url);
-
                                 $('#rowList').append(newTr);
-                                // 进度条删除
+
+                                // 自己的进度删除
                                 tr.remove();
                             })
 
