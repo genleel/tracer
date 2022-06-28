@@ -137,6 +137,7 @@ def file_delete(request, project_id):
 @csrf_exempt
 def cos_credential(request, project_id):
     """ 获取cos上传临时凭证 """
+    print('cos_credential...')
     per_file_limit = request.tracer.price_policy.per_file_size * 1024 * 1024
     total_file_limit = request.tracer.price_policy.project_space * 1024 * 1024 * 1024
 
@@ -216,12 +217,13 @@ def file_download(request, project_id, file_id):
     file_object = models.FileRepository.objects.filter(id=file_id, project_id=project_id).first()
     res = requests.get(file_object.file_path)
 
+    # 文件分块处理（适用于大文件）     @孙歆尧
     data = res.iter_content()
 
-    # 设置content_type=application/octet-stream 用于提示下载框
+    # 设置content_type=application/octet-stream 用于提示下载框        @孙歆尧
     response = HttpResponse(data, content_type="application/octet-stream")
     from django.utils.encoding import escape_uri_path
 
-    # 设置响应头：中文件文件名转义
+    # 设置响应头：中文件文件名转义      @王洋
     response['Content-Disposition'] = "attachment; filename={};".format(escape_uri_path(file_object.name))
     return response

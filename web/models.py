@@ -162,7 +162,8 @@ class Issues(models.Model):
 
     assign = models.ForeignKey(verbose_name='指派', to='UserInfo', related_name='task', null=True, blank=True,
                                on_delete=models.CASCADE)
-    attention = models.ManyToManyField(verbose_name='关注者', to='UserInfo', related_name='observe', null=True, blank=True)
+    attention = models.ManyToManyField(verbose_name='关注者', to='UserInfo', related_name='observe', null=True,
+                                       blank=True)
 
     start_date = models.DateField(verbose_name='开始时间', null=True, blank=True)
     end_date = models.DateField(verbose_name='结束时间', null=True, blank=True)
@@ -216,11 +217,11 @@ class IssuesReply(models.Model):
 
     issues = models.ForeignKey(verbose_name='问题', to='Issues', on_delete=models.CASCADE)
     content = models.TextField(verbose_name='描述')
-    creator = models.ForeignKey(verbose_name='创建者', to='UserInfo', related_name='create_reply', on_delete=models.CASCADE)
+    creator = models.ForeignKey(verbose_name='创建者', to='UserInfo', related_name='create_reply',
+                                on_delete=models.CASCADE)
     create_datetime = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
     reply = models.ForeignKey(verbose_name='回复', to='self', null=True, blank=True, on_delete=models.CASCADE)
-
 
 
 class ProjectInvite(models.Model):
@@ -237,4 +238,5 @@ class ProjectInvite(models.Model):
     )
     period = models.IntegerField(verbose_name='有效期', choices=period_choices, default=1440)
     create_datetime = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
-    creator = models.ForeignKey(verbose_name='创建者', to='UserInfo', related_name='create_invite', on_delete=models.CASCADE)
+    creator = models.ForeignKey(verbose_name='创建者', to='UserInfo', related_name='create_invite',
+                                on_delete=models.CASCADE)

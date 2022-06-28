@@ -2107,7 +2107,6 @@
         
         focus : function() {
             this.cm.focus();
-
             return this;
         },
         
@@ -2790,7 +2789,7 @@
     /**
      * 显示透明背景层
      * Display mask layer when dialog opening
-     * 
+     * onchange
      * @param   {Object}     dialog    dialog jQuery object
      * @returns {void}
      */
