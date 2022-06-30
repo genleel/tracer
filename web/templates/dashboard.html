@@ -1,6 +1,7 @@
 {% extends 'layout/manage.html' %}
 {% load dashboard %}
 {% load issues %}
+{% load static %}
 {% block css %}
     <style>
         .table-right > tbody > tr > td.label-left {
@@ -193,4 +194,82 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'plugin/highcharts/highcharts.js' %}"></script>
+    <script>
+        var INIT_CHART = "{% url 'issues_chart' project_id=request.tracer.project.id %}";
+
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+
+        $(function () {
+            initChart();
+        });
+
+        function initChart() {
+            // chart
+            var config = {
+                title: {
+                    text: null   // 不显示标题
+                },
+                legend: {
+                    enabled: false // 关闭图例提示
+                },
+                credits: {
+                    enabled: false // 关闭版权信息
+                },
+                yAxis: {
+                    title: {
+                        text: '问题数量' // Y周文本提示
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickInterval: 60 * 60 * 24 * 1000,
+                    labels: {
+                        formatter: function () {
+                            return Highcharts.dateFormat('%m-%d', this.value);
+                        },
+                        rotation: -30
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<b>{point.key}</b><br>',
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> 数量: {point.y} ',
+                    xDateFormat: '%Y-%m-%d',
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'normal',
+                        lineColor: '#666666',
+                        lineWidth: 1,
+                        marker: {
+                            lineWidth: 1,
+                            lineColor: '#666666'
+                        }
+                    }
+                },
+                series: [{
+                    data: []
+                }]
+            };
+            $.ajax({
+                url: INIT_CHART,
+                type: "GET",
+                dataType: "JSON",
+                success: function (res) {
+                    config.series[0].data = res.data;
+                    var chart = Highcharts.chart('chart', config);
+                }
+            });
+
+
+        }
+
+    </script>
 {% endblock %}
